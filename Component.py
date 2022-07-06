@@ -8,7 +8,7 @@ class Component:
         self._node2 = n2
 
     def getNodes(self) -> list[Node]:
-        return self.node1, self.node2
+        return self._node1, self._node2
     
     def setNodes(self, n1: Node, n2: Node) -> None:
         self._node1 = n1

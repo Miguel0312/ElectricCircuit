@@ -14,3 +14,9 @@ class Node:
 
     def getID(self) -> int:
         return self._id
+
+    def __str__(self) -> str:
+        return str(self._id)
+
+    def __lt__(self, n2):
+        return self.getID() < n2.getID()
