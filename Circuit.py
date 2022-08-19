@@ -1,5 +1,6 @@
-from importlib.resources import path
+import numpy as np
 from Component import Component
+from ComponentType import ComponentType
 from Node import Node
 from Path import Path
 
@@ -59,3 +60,49 @@ class Circuit:
                                     repeat = True
                             if sub.isNew(cycles) and not repeat:
                                 cycles.append(sub)
+
+    def makeEquations(self, currentEquations: list[list[float]], voltageEquationsCoefficients: list[list[float]], voltageEquationsTerms: list[float]):
+        coefficients = []
+        for c in currentEquations:
+            coefficients.append(c)
+        for c in voltageEquationsCoefficients:
+            coefficients.append(c)
+        
+        terms = []
+        for _ in range(len(currentEquations)):
+            terms.append([0])
+        for t in voltageEquationsTerms:
+            terms.append([t])
+        
+        return np.array(coefficients), np.array(terms)
+
+    def solveCircuit(self):
+        #Get equations from Kirchhoff's current law
+        currentEquations = [[0]*len(self._components) for i in range(len(self._nodes))]
+        for i in range(len(self._components)):
+            n1, n2 = self._components[i].getNodes()
+            currentEquations[self._nodes.index(n1)][i] = -1
+            currentEquations[self._nodes.index(n2)][i] = 1
+
+        #Get equations from Kirchhoff's voltage law
+        cycles = self.getCycles()
+        voltageEquationsCoefficients = [[0]*len(self._components) for _ in range(len(cycles))]
+        voltageEquationsTerms = [0 for _ in range(len(cycles))]
+        for j in range(len(cycles)):
+            cycle = cycles[j]
+            for i in range(len(cycle.components)):
+                component = cycle.components[i]
+                if component.getType() == ComponentType.resistance:
+                    if component.getNodes()[0] == cycle.nodes[i]:
+                        voltageEquationsCoefficients[j][self._components.index(cycle.components[i])] = component.getResistance()
+                    else:
+                        voltageEquationsCoefficients[j][self._components.index(cycle.components[i])] = -component.getResistance()
+                if component.getType() == ComponentType.generator:
+                    if component.getNodes()[0] == cycle.nodes[i]:
+                        voltageEquationsTerms[j] -= component.getTension()
+                    else:
+                        voltageEquationsTerms[j] += component.getTension()
+        
+        coefficients, terms = self.makeEquations(currentEquations, voltageEquationsCoefficients, voltageEquationsTerms)
+        inverse = np.linalg.pinv(coefficients)
+        print(np.matmul(inverse, terms))
