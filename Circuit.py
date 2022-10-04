@@ -103,6 +103,7 @@ class Circuit:
                     else:
                         voltageEquationsTerms[j] += component.getTension()
         
+        #Solve the system using numpy utilities
         coefficients, terms = self.makeEquations(currentEquations, voltageEquationsCoefficients, voltageEquationsTerms)
         inverse = np.linalg.pinv(coefficients)
         print(np.matmul(inverse, terms))
