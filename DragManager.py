@@ -41,7 +41,7 @@ class DragManager():
         for c in self.components:
             for node in [node1, node2]:
                 for destNode in [c.node1, c.node2]:
-                    if(pow(node[0] - destNode[0], 2) + pow(node[1] - destNode[1], 2) <= 50):
+                    if(pow(node[0] - destNode[0], 2) + pow(node[1] - destNode[1], 2) <= 80):
                         x = destNode[0] + (node1[0] + node2[0] - 2*node[0])/2
                         y = destNode[1] + (node1[1] + node2[1] - 2*node[1])/2
                         break
@@ -55,16 +55,25 @@ class DragManager():
 
         node1 = [x + self.imageWidth/2*cos(radians(self.angle)), y + self.imageHeight/2*sin(radians(self.angle))]
         node2 = [x - self.imageWidth/2*cos(radians(self.angle)), y - self.imageHeight/2*sin(radians(self.angle))]
+        neighbour = None
 
         for c in self.components:
             for node in [node1, node2]:
                 for destNode in [c.node1, c.node2]:
-                    if(pow(node[0] - destNode[0], 2) + pow(node[1] - destNode[1], 2) <= 50):
+                    if(pow(node[0] - destNode[0], 2) + pow(node[1] - destNode[1], 2) <= 80):
                         x = destNode[0] + (node1[0] + node2[0] - 2*node[0])/2
                         y = destNode[1] + (node1[1] + node2[1] - 2*node[1])/2
-                        break
+                        neighbour = c
+                        if neighbour.angle % 180 != 0:
+                            break
+                if neighbour != None and neighbour.angle % 180 != 0:
+                    break
         
         fc.place(x=x, y=y, angle=self.angle)
+
+        if neighbour != None:
+            fc.addNeighbour(neighbour)
+            neighbour.addNeighbour(fc)
         
         self.components.append(fc)
 

@@ -20,4 +20,4 @@ class ComponentIcon(ttk.Label):
     self.image = ImageTk.PhotoImage(image=image)
     self.type = type
 
-    super().__init__(container, image = self.image, padding=5)
+    super().__init__(container, image = self.image, padding=5, style="Menu.TLabel")
