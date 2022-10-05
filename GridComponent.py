@@ -1,3 +1,4 @@
+from math import sin, cos, radians
 import tkinter as tk
 from tkinter import ttk
 from PIL import Image, ImageTk
@@ -22,7 +23,9 @@ class GridComponent(ttk.Label):
 
     super().__init__(container, image = self.image)
 
-  def place(self, x, y):
-    super().place(x=x, y=y)
-    self.node1 = [x, y+self.image.height()/2]
-    self.node2 = [x + self.image.width(), y+self.image.height()/2]
+  def place(self, x, y, angle):
+    super().place(x=x-self.image.width()/2, y=y-self.image.height())
+    self.node1 = [x + self.image.width()/2*cos(radians(angle)), y + self.image.height()/2*sin(radians(angle))]
+    self.node2 = [x - self.image.width()/2*cos(radians(angle)), y - self.image.height()/2*sin(radians(angle))]
+    self.angle = angle
+    
