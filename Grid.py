@@ -1,7 +1,8 @@
-import tkinter as tk
-from tkinter import ttk
-import screeninfo
+from PySide6.QtWidgets import QWidget
 
-class Grid(ttk.Frame):
-  def __init__(self, container: tk.Tk):
-    super().__init__(container)
+
+class Grid(QWidget):
+  def __init__(self):
+    super().__init__()
+    self.setAutoFillBackground(True)
+    self.setAcceptDrops(True)

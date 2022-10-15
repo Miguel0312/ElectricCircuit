@@ -1,29 +1,30 @@
-import tkinter as tk
-from tkinter import ttk
-from ComponentIcon import ComponentIcon
+from PySide6.QtWidgets import QWidget, QHBoxLayout
+from PySide6.QtGui import QPalette, QColor
+from PySide6.QtCore import Qt
 from ComponentType import ComponentType
-from DragManager import DragManager
+from ComponentIcon import ComponentIcon
+from Grid import Grid
+from GridComponent import GridComponent
 
-class Menu(ttk.Frame):
-  def __init__(self, container, dm: DragManager):
-    super().__init__(container, style="Menu.TFrame")
+class Menu(QWidget):
+  def __init__(self, grid: Grid, components: list[GridComponent]):
+    super().__init__()
+    self.setAutoFillBackground(True)
 
-    self.rowconfigure(0, weight=1)
+    palette = self.palette()
+    palette.setColor(QPalette.Window, QColor("#aaa"))
+    self.setPalette(palette)
+    
 
-    self.columnconfigure(0, weight=7)
-    self.columnconfigure(1, weight=1)
-    self.columnconfigure(2, weight=1)
-    self.columnconfigure(3, weight=1)
-    self.columnconfigure(4, weight=7)
+    self.layout = QHBoxLayout(self)
 
-    wireIcon = ComponentIcon(self, ComponentType.wire)
-    resistanceIcon = ComponentIcon(self, ComponentType.resistance)
-    generatorIcon = ComponentIcon(self, ComponentType.generator)
+    self.wireIcon = ComponentIcon(ComponentType.wire, grid, components)
+    self.resistanceIcon = ComponentIcon(ComponentType.resistance, grid, components)
+    self.generatorIcon = ComponentIcon(ComponentType.generator, grid, components)
 
-    dm.add_dragable(wireIcon)
-    dm.add_dragable(resistanceIcon)
-    dm.add_dragable(generatorIcon)
-
-    wireIcon.grid(row=0, column=1)
-    resistanceIcon.grid(row=0, column=2)
-    generatorIcon.grid(row=0, column=3)
+    self.layout.addStretch(5)
+    self.layout.addWidget(self.wireIcon, stretch=1)
+    self.layout.addWidget(self.resistanceIcon, stretch=1)
+    self.layout.addWidget(self.generatorIcon, stretch=1)
+    self.layout.addStretch(5)
+    

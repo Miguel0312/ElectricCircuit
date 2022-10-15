@@ -13,7 +13,7 @@ class Path:
         self.nodes.append(node)
         self.components.append(component)
 
-    def extend(self, path):
+    def extend(self, path: "Path"):
         for node in path.nodes:
             self.nodes.append(node)
         for component in path.components:

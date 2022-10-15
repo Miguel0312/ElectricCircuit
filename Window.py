@@ -1,31 +1,30 @@
-import tkinter as tk
-from tkinter import ttk
+from PySide6.QtWidgets import QMainWindow, QWidget, QVBoxLayout
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QPalette, QColor
+from GridComponent import GridComponent
 from Menu import Menu
 from Grid import Grid
-from DragManager import DragManager
 
-class Window(tk.Tk):
-    def __init__(self):
-        super().__init__()
+class Window(QMainWindow):
+  def __init__(self):
+    super().__init__()
+    self.showMaximized()
 
-        screenWidth = self.winfo_screenwidth()
-        screenHeight = self.winfo_screenheight()
+    self.components: list[GridComponent] = []
 
-        self.geometry("%dx%d+%d+%d" % (screenWidth, screenHeight, 0, 0))
-        self.title("Electric Circuit Solver")
-        self.rowconfigure(0, weight=1)
-        self.rowconfigure(1, weight=16)
-        self.columnconfigure(0 , weight=1)
+    self.central = QWidget()
+    self.layout = QVBoxLayout(self.central)
+    self.layout.setContentsMargins(0, 0, 0, 0)
+    self.layout.setSpacing(0)
 
-        self.style = ttk.Style()
-        self.style.configure("Menu.TFrame", background="#aaa")
+    self.setCentralWidget(self.central)
 
-        components = []
+    palette = self.palette()
+    palette.setColor(QPalette.Window, QColor("white"))
+    self.setPalette(palette)
 
-        dm = DragManager(self, components)
+    self.grid = Grid()
+    self.menu = Menu(self.grid, self.components)
 
-        menu = Menu(self, dm)
-        grid = Grid(self)
-
-        menu.grid(row=0, column=0, sticky="NSEW")
-        grid.grid(row=1, column=0, sticky="NSEW")
+    self.layout.addWidget(self.menu, stretch=1)
+    self.layout.addWidget(self.grid, stretch=10)

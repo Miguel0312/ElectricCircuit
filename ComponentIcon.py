@@ -1,11 +1,16 @@
-import tkinter as tk
-from tkinter import ttk
-from PIL import Image, ImageTk
+from math import cos, radians, sin
+from PySide6.QtWidgets import QLabel
+from PySide6.QtGui import QPixmap, QTransform, QMouseEvent
+from PySide6.QtCore import Qt
 from ComponentType import ComponentType
+from Grid import Grid
+from GridComponent import GridComponent
 
-class ComponentIcon(ttk.Label):
-  def __init__(self, container, type):
+class ComponentIcon(QLabel):
+  def __init__(self, type: ComponentType, grid: Grid, components: list[GridComponent]):
+    self.grid = grid
     self.path = "./assets/"
+    self.components = components
 
     if type == ComponentType.wire:
       self.path += "Wire"
@@ -14,10 +19,75 @@ class ComponentIcon(ttk.Label):
     elif type == ComponentType.generator:
       self.path += "Generator"
 
-    image = Image.open(self.path + ".png")
-    image = image.resize((64, 64), Image.ANTIALIAS)
-    #Prevents the image from being considered as garbage when the program exits the constructor
-    self.image = ImageTk.PhotoImage(image=image)
     self.type = type
+    self.image = QPixmap(self.path)
+    self.image = self.image.scaled(64, 64)
 
-    super().__init__(container, image = self.image, padding=5, style="Menu.TLabel")
+    super().__init__()
+    self.setPixmap(self.image)
+  
+    self.setFocusPolicy(Qt.StrongFocus)
+
+  def mousePressEvent(self, event: QMouseEvent):
+    if event.button() == Qt.LeftButton:
+        self.setCursor(Qt.ClosedHandCursor)
+        # This will give us the start position when a drag is triggered
+        self.drag_start_pos = event.pos()
+        self.clone = QLabel(parent=self.grid)
+        self.clone.angle = 0
+        self.clone.setPixmap(self.image)
+        x = (event.pos() + self.pos() - self.grid.pos()).x() - 32
+        y = (event.pos() + self.pos() - self.grid.pos()).y() - 32
+        self.clone.move(x, y)
+        self.clone.show()
+
+    super().mousePressEvent(event)
+
+  def mouseMoveEvent(self, event: QMouseEvent):
+    x = (event.pos() + self.pos() - self.grid.pos()).x()
+    y = (event.pos() + self.pos() - self.grid.pos()).y()
+
+    node1 = [x + 32*cos(radians(self.clone.angle)), y + 32*sin(radians(self.clone.angle))]
+    node2 = [x - 32*cos(radians(self.clone.angle)), y - 32*sin(radians(self.clone.angle))]
+
+    for c in self.components:
+      for node in [node1, node2]:
+        for destNode in [c.node1, c.node2]:
+          if(pow(node[0] - destNode[0], 2) + pow(node[1] - destNode[1], 2) <= 80):
+            x = destNode[0] + (node1[0] + node2[0] - 2*node[0])/2
+            y = destNode[1] + (node1[1] + node2[1] - 2*node[1])/2
+            break
+
+
+    self.clone.move(x-32, y-32)
+    super().mouseMoveEvent(event)
+
+  def mouseReleaseEvent(self, event: QMouseEvent):
+    self.setCursor(Qt.ArrowCursor)
+    self.drag_start_pos = None
+
+    x = (event.pos() + self.pos() - self.grid.pos()).x()    
+    y = (event.pos() + self.pos() - self.grid.pos()).y()
+
+    node1 = [x + 32*cos(radians(self.clone.angle)), y + 32*sin(radians(self.clone.angle))]
+    node2 = [x - 32*cos(radians(self.clone.angle)), y - 32*sin(radians(self.clone.angle))]
+
+    for c in self.components:
+      for node in [node1, node2]:
+        for destNode in [c.node1, c.node2]:
+          if(pow(node[0] - destNode[0], 2) + pow(node[1] - destNode[1], 2) <= 80):
+            x = destNode[0] + (node1[0] + node2[0] - 2*node[0])/2
+            y = destNode[1] + (node1[1] + node2[1] - 2*node[1])/2
+            break
+
+    self.components.append(GridComponent(self.grid, self.type, x, y, self.clone.angle))
+
+    self.clone.deleteLater()
+
+    super().mouseReleaseEvent(event)
+
+  def keyPressEvent(self, event: QMouseEvent):
+    if not event.isAutoRepeat() and event.key() == Qt.Key_R and self.drag_start_pos != None:
+      self.clone.angle = (self.clone.angle + 90) % 360
+      self.clone.setPixmap(self.image.transformed(QTransform().rotate(self.clone.angle)))
+    return super().keyPressEvent(event)
