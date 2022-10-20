@@ -47,16 +47,19 @@ class ComponentIcon(QLabel):
     x = (event.pos() + self.pos() - self.grid.pos()).x()
     y = (event.pos() + self.pos() - self.grid.pos()).y()
 
-    node1 = [x + 32*cos(radians(self.clone.angle)), y + 32*sin(radians(self.clone.angle))]
-    node2 = [x - 32*cos(radians(self.clone.angle)), y - 32*sin(radians(self.clone.angle))]
+    node1Position = [x + 32*cos(radians(self.clone.angle)), y + 32*sin(radians(self.clone.angle))]
+    node2Position = [x - 32*cos(radians(self.clone.angle)), y - 32*sin(radians(self.clone.angle))]
 
     for c in self.components:
-      for node in [node1, node2]:
+      for node in [node1Position, node2Position]:
         for destNode in [c.node1, c.node2]:
-          if(pow(node[0] - destNode[0], 2) + pow(node[1] - destNode[1], 2) <= 80):
-            x = destNode[0] + (node1[0] + node2[0] - 2*node[0])/2
-            y = destNode[1] + (node1[1] + node2[1] - 2*node[1])/2
-            break
+          if(pow(node[0] - destNode.position[0], 2) + pow(node[1] - destNode.position[1], 2) <= 80):
+            x = destNode.position[0] + (node1Position[0] + node2Position[0] - 2*node[0])/2
+            y = destNode.position[1] + (node1Position[1] + node2Position[1] - 2*node[1])/2
+            if node == node1Position:
+              node1 = destNode
+            elif node == node2Position:
+              node2 = destNode
 
 
     self.clone.move(x-32, y-32)
@@ -69,18 +72,23 @@ class ComponentIcon(QLabel):
     x = (event.pos() + self.pos() - self.grid.pos()).x()    
     y = (event.pos() + self.pos() - self.grid.pos()).y()
 
-    node1 = [x + 32*cos(radians(self.clone.angle)), y + 32*sin(radians(self.clone.angle))]
-    node2 = [x - 32*cos(radians(self.clone.angle)), y - 32*sin(radians(self.clone.angle))]
+    node1Position = [x + 32*cos(radians(self.clone.angle)), y + 32*sin(radians(self.clone.angle))]
+    node2Position = [x - 32*cos(radians(self.clone.angle)), y - 32*sin(radians(self.clone.angle))]
+    node1 = None
+    node2 = None
 
     for c in self.components:
-      for node in [node1, node2]:
+      for node in [node1Position, node2Position]:
         for destNode in [c.node1, c.node2]:
-          if(pow(node[0] - destNode[0], 2) + pow(node[1] - destNode[1], 2) <= 80):
-            x = destNode[0] + (node1[0] + node2[0] - 2*node[0])/2
-            y = destNode[1] + (node1[1] + node2[1] - 2*node[1])/2
-            break
+          if(pow(node[0] - destNode.position[0], 2) + pow(node[1] - destNode.position[1], 2) <= 80):
+            x = destNode.position[0] + (node1Position[0] + node2Position[0] - 2*node[0])/2
+            y = destNode.position[1] + (node1Position[1] + node2Position[1] - 2*node[1])/2
+            if node == node1Position:
+              node1 = destNode
+            elif node == node2Position:
+              node2 = destNode
 
-    self.components.append(GridComponent(self.grid, self.type, x, y, self.clone.angle))
+    self.components.append(GridComponent(self.grid, self.type, x, y, self.clone.angle, node1, node2))
 
     self.clone.deleteLater()
 

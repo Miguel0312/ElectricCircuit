@@ -6,7 +6,7 @@ if TYPE_CHECKING:
 class Node:
     currentID = 0
 
-    def __init__(self, circuit: "Circuit") -> None:
+    def __init__(self, circuit: "Circuit", position=None) -> None:
         self._id = Node.currentID
         Node.currentID += 1
         self._tension = 0
@@ -14,6 +14,7 @@ class Node:
         circuit.addNode(self)
         self._tension = 0
         self._calculated = False
+        self.position = position
 
     def getTension(self) -> float:
         return self._tension
