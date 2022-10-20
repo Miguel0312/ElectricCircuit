@@ -28,8 +28,9 @@ class Node:
     def setTension(self, tension: float) -> None:
         if not self._calculated:
             self._tension = tension
+            self._calculated = True
 
-    def getCurrent(self) -> float:
+    def getTension(self) -> float:
         if self._calculated:
             return self._tension
         raise Exception("Tension of this node hasn't been calculated yet")

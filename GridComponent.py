@@ -39,12 +39,10 @@ class GridComponent(QLabel):
 
     if node1 == None:
       self.node1 = Node(container.circuit, node1Position)
-      container.circuit.addNode(self.node1)
     else:
       self.node1 = node1
     if node2 == None:
       self.node2 = Node(container.circuit, node2Position)
-      container.circuit.addNode(self.node2)
     else:
       self.node2 = node2
 

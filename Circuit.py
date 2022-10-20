@@ -1,13 +1,16 @@
+from typing import List
+
 import numpy as np
 from Component import Component
 from ComponentType import ComponentType
 from Node import Node
 from Path import Path
+from queue import Queue
 
 class Circuit:
     def __init__(self):
-        self._nodes = []
-        self._components = []
+        self._nodes: List[Node] = []
+        self._components: List[Component] = []
 
     def addNode(self, n: Node) -> None:
         self._nodes.append(n)
@@ -30,7 +33,7 @@ class Circuit:
                 self.findNewCycles(p, cycles)
         return cycles
 
-    def findNewCycles(self, path: Path, cycles: list[Path]) -> None:
+    def findNewCycles(self, path: Path, cycles: List[Path]) -> None:
         start_node = path.nodes[0]
         next_node= None
         sub = []
@@ -106,4 +109,24 @@ class Circuit:
         #Solve the system using numpy utilities
         coefficients, terms = self.makeEquations(currentEquations, voltageEquationsCoefficients, voltageEquationsTerms)
         inverse = np.linalg.pinv(coefficients)
-        print(np.matmul(inverse, terms))
+        currents = np.matmul(inverse, terms)
+
+        for i in range(len(self._components)):
+            self._components[i].setCurrent(currents[i][0])
+
+        self._nodes[0].setTension(0.0)
+        nodes = Queue(len(self._nodes))
+        nodes.put(self._nodes[0])
+
+        while(not nodes.empty()):
+            calculated = nodes.get()
+            for c in self._components:
+                if(c._node1 == calculated and not c._node2.getCalculated()):
+                    c.calculate(c._node2)
+                    nodes.put(c._node2)
+                elif(c._node2 == calculated and not c._node1.getCalculated()):
+                    c.calculate(c._node1)
+                    nodes.put(c._node1)
+
+        #for node in self._nodes:
+        #   print(str(node.getID()) + " " + str(node.getTension()))

@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QWidget, QHBoxLayout
+from PySide6.QtWidgets import QWidget, QHBoxLayout, QPushButton
 from PySide6.QtGui import QPalette, QColor
 from PySide6.QtCore import Qt
 from ComponentType import ComponentType
@@ -22,9 +22,13 @@ class Menu(QWidget):
     self.resistanceIcon = ComponentIcon(ComponentType.resistance, grid, components)
     self.generatorIcon = ComponentIcon(ComponentType.generator, grid, components)
 
+    self.button = QPushButton(text="Go")
+    self.button.clicked.connect(grid.circuit.solveCircuit)
+
     self.layout.addStretch(5)
     self.layout.addWidget(self.wireIcon, stretch=1)
     self.layout.addWidget(self.resistanceIcon, stretch=1)
     self.layout.addWidget(self.generatorIcon, stretch=1)
     self.layout.addStretch(5)
+    self.layout.addWidget(self.button, stretch = 1)
     

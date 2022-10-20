@@ -25,6 +25,7 @@ class Component:
     def setCurrent(self, current: float) -> None:
         if not self._calculated:
             self._current = current
+            self._calculated = True
 
     def getCurrent(self) -> float:
         if self._calculated:
@@ -36,3 +37,15 @@ class Component:
 
     def getCalculated(self) -> bool:
         return self._calculated
+
+    def calculate(self, node: Node):
+        if node == self._node1:
+            if self._node2.getCalculated():
+                self._node1.setTension(self._node2.getTension())
+            else:
+                raise Exception("The tension of neither of the nodes has been calculated yet.")
+        if node == self._node2:
+            if self._node1.getCalculated():
+                self._node2.setTension(self._node1.getTension())
+            else:
+                raise Exception("The tension of neither of the nodes has been calculated yet.")
