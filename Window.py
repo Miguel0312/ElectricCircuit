@@ -4,6 +4,7 @@ from PySide6.QtGui import QPalette, QColor
 from GridComponent import GridComponent
 from Menu import Menu
 from Grid import Grid
+from Footer import Footer
 
 class Window(QMainWindow):
   def __init__(self):
@@ -23,8 +24,10 @@ class Window(QMainWindow):
     palette.setColor(QPalette.Window, QColor("white"))
     self.setPalette(palette)
 
-    self.grid = Grid()
-    self.menu = Menu(self.grid, self.components)
+    self.footer = Footer()
+    self.grid = Grid(self.components, self.footer)
+    self.menu = Menu(self.grid, self.footer, self.components)
 
     self.layout.addWidget(self.menu, stretch=1)
     self.layout.addWidget(self.grid, stretch=10)
+    self.layout.addWidget(self.footer, stretch=1)

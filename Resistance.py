@@ -9,6 +9,9 @@ class Resistance(Component):
 
     def getResistance(self) -> float:
         return self._resistance
+    
+    def setResistance(self, resistance: float) -> None:
+        self._resistance = resistance
 
     def calculate(self, node: Node):
         if node == self._node1:

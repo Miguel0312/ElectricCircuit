@@ -80,6 +80,22 @@ class Circuit:
         return np.array(coefficients), np.array(terms)
 
     def solveCircuit(self):
+        allTensions: bool = True
+        allCurrents: bool = True 
+        for node in self._nodes:
+            if not node.getCalculated():
+                allTensions = False
+        for comp in self._components:
+            if not comp.getCalculated():
+                allCurrents = False
+        #If all tensions and all currents are already calculated, the circuit didn't change
+        #So there is no need to calculate again
+        if allTensions and allCurrents:
+            return
+        for node in self._nodes:
+            node.setCalculated(False)
+        for comp in self._components:
+            comp.setCalculated(False)
         #Get equations from Kirchhoff's current law
         currentEquations = [[0]*len(self._components) for i in range(len(self._nodes))]
         for i in range(len(self._components)):
@@ -112,7 +128,7 @@ class Circuit:
         currents = np.matmul(inverse, terms)
 
         for i in range(len(self._components)):
-            self._components[i].setCurrent(currents[i][0])
+            self._components[i].setCurrent(round(currents[i][0],4))
 
         self._nodes[0].setTension(0.0)
         nodes = Queue(len(self._nodes))
@@ -129,4 +145,4 @@ class Circuit:
                     nodes.put(c._node1)
 
         #for node in self._nodes:
-        #   print(str(node.getID()) + " " + str(node.getTension()))
+            #print(str(node.getID()) + " " + str(node.getTension()))

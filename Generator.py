@@ -10,6 +10,9 @@ class Generator(Component):
     def getTension(self) -> float:
         return self._tension
 
+    def setTension(self, tension: float) -> None:
+        self._tension = tension
+
     def calculate(self, node: Node):
         if node == self._node1:
             if self._node2.getCalculated():
