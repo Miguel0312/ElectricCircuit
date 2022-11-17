@@ -14,3 +14,5 @@ Drag and drop components from the top menu to build your circuit. Click on a com
 of the resistance and tension of the generators can be adjusted. The button on the right upper corner will trigger the calculations of currents and
 tensions. Then, when clicking a component the bottom menu will show the tensions of the two nodes of the component and the intensity and direction of 
 the current that is passing through it.
+
+![Example of circuit that can be built](/assets/Example.png)
